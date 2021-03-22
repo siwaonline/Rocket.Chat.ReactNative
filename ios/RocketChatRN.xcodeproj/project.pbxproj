@@ -144,6 +144,8 @@
 		BCB4ECC9D98CA626FD87906C /* libPods-defaults-RocketChatRN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD96B27BA4184219615DE18 /* libPods-defaults-RocketChatRN.a */; };
 		D5DD7155FDB00ED6B8433BBD /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		DD2BA30A89E64F189C2C24AC /* libWatermelonDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA7E862283664608B3894E34 /* libWatermelonDB.a */; };
+		FD08262525FFA8A100392A9E /* Experimental.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A14FCEC257FEB3A005BDCD4 /* Experimental.xcassets */; };
+		FD08262B25FFA8AC00392A9E /* Experimental.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A14FCEC257FEB3A005BDCD4 /* Experimental.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -787,6 +789,7 @@
 				7A3268F724F04FFE0050E241 /* custom.ttf in Resources */,
 				1EC6ACB722CB9FC300A41C61 /* MainInterface.storyboard in Resources */,
 				AC429D9825FB821B00A1C194 /* GoogleService-Info.plist in Resources */,
+				FD08262525FFA8A100392A9E /* Experimental.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,6 +799,7 @@
 			files = (
 				1E6CC61F2513DBF400965591 /* (null) in Resources */,
 				AC429D9925FB821B00A1C194 /* GoogleService-Info.plist in Resources */,
+				FD08262B25FFA8AC00392A9E /* Experimental.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
