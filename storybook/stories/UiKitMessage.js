@@ -1,11 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
-import { ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { storiesOf } from '@storybook/react-native';
 
+import MessageContext from '../../app/containers/message/Context';
 import { UiKitMessage } from '../../app/containers/UIKit';
-import StoriesSeparator from './StoriesSeparator';
-
-// eslint-disable-next-line react/prop-types
-const Separator = ({ title }) => <StoriesSeparator title={title} theme='light' />;
+import { themes } from '../../app/constants/colors';
 
 const styles = StyleSheet.create({
 	container: {
@@ -17,205 +17,269 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default () => (
-	<SafeAreaView style={styles.container}>
+const user = {
+	id: 'y8bd77ptZswPj3EW8',
+	username: 'diego.mello',
+	token: '79q6lH40W4ZRGLOshDiDiVlQaCc4f_lU9HNdHLAzuHz'
+};
+
+const baseUrl = 'https://open.rocket.chat';
+
+const messageDecorator = story => (
+	<MessageContext.Provider
+		value={{
+			user,
+			baseUrl,
+			onPress: () => {},
+			onLongPress: () => {},
+			reactionInit: () => {},
+			onErrorPress: () => {},
+			replyBroadcast: () => {},
+			onReactionPress: () => {},
+			onDiscussionPress: () => {},
+			onReactionLongPress: () => {},
+			threadBadgeColor: themes.light.tunreadColor
+		}}>
+		{story()}
+	</MessageContext.Provider>
+);
+
+const stories = storiesOf('UiKitMessage', module)
+	.addDecorator(story => <SafeAreaView style={styles.container}>{story()}</SafeAreaView>)
+	.addDecorator(story => (
 		<ScrollView style={[styles.container, styles.padding]} keyboardShouldPersistTaps='always'>
-			<Separator title='Section' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section'
-					}
-				}])
-			}
+			{story()}
+		</ScrollView>
+	))
+	.addDecorator(messageDecorator);
 
-			<Separator title='Section + Markdown List' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: '*List*:\n1. Item'
-					}
-				}])
+const Section = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section'
 			}
+		}
+	]);
+stories.add('Section', () => <Section />);
 
-			<Separator title='Section + Overflow' />
-			{
-				UiKitMessage([
+const SectionMarkdownList = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: '*List*:\n1. Item'
+			}
+		}
+	]);
+stories.add('Section + Markdown List', () => <SectionMarkdownList />);
+
+const SectionOverflow = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + Overflow'
+			},
+			accessory: {
+				type: 'overflow',
+				options: [
 					{
-						type: 'section',
 						text: {
-							type: 'mrkdwn',
-							text: 'Section + Overflow'
+							type: 'plain_text',
+							text: 'Option 1',
+							emoji: true
 						},
-						accessory: {
-							type: 'overflow',
-							options: [
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Option 1',
-										emoji: true
-									},
-									value: 'value-0'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Option 2',
-										emoji: true
-									},
-									value: 'value-1'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Option 3',
-										emoji: true
-									},
-									value: 'value-2'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Option 4',
-										emoji: true
-									},
-									value: 'value-3'
-								}
-							]
-						}
-					}
-				])
-			}
-
-			<Separator title='Section + image' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section + Image'
+						value: 'value-0'
 					},
-					accessory: {
-						type: 'image',
-						imageUrl: 'https://raw.githubusercontent.com/RocketChat/Rocket.Chat.Artwork/master/Logos/icon-circle-256.png',
-						altText: 'plants'
-					}
-				}])
-			}
-
-			<Separator title='Section + button' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section + button'
+					{
+						text: {
+							type: 'plain_text',
+							text: 'Option 2',
+							emoji: true
+						},
+						value: 'value-1'
 					},
-					accessory: {
-						type: 'button',
+					{
+						text: {
+							type: 'plain_text',
+							text: 'Option 3',
+							emoji: true
+						},
+						value: 'value-2'
+					},
+					{
+						text: {
+							type: 'plain_text',
+							text: 'Option 4',
+							emoji: true
+						},
+						value: 'value-3'
+					}
+				]
+			}
+		}
+	]);
+stories.add('Section + Overflow', () => <SectionOverflow />);
+
+const SectionImage = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + Image'
+			},
+			accessory: {
+				type: 'image',
+				imageUrl: 'https://raw.githubusercontent.com/RocketChat/Rocket.Chat.Artwork/master/Logos/icon-circle-256.png',
+				altText: 'plants'
+			}
+		}
+	]);
+stories.add('Section + image', () => <SectionImage />);
+
+const SectionButton = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + button'
+			},
+			accessory: {
+				type: 'button',
+				text: {
+					type: 'plain_text',
+					text: 'button'
+				}
+			}
+		}
+	]);
+stories.add('Section + button', () => <SectionButton />);
+
+const SectionSelect = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + select'
+			},
+			accessory: {
+				type: 'static_select',
+				options: [
+					{
+						value: 1,
 						text: {
 							type: 'plain_text',
 							text: 'button'
 						}
-					}
-				}])
-			}
-
-			<Separator title='Section + Select' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section + select'
 					},
-					accessory: {
-						type: 'static_select',
-						options: [
-							{
-								value: 1,
-								text: {
-									type: 'plain_text',
-									text: 'button'
-								}
-							}, {
-								value: 2,
-								text: {
-									type: 'plain_text',
-									text: 'second button'
-								}
-							}]
-					}
-				}])
-			}
-
-			<Separator title='Section + DatePicker' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section + DatePicker'
-					},
-					accessory: {
-						type: 'datepicker',
-						initial_date: '1990-04-28',
-						placeholder: {
+					{
+						value: 2,
+						text: {
 							type: 'plain_text',
-							text: 'Select a date',
-							emoji: true
+							text: 'second button'
 						}
 					}
-				}])
+				]
 			}
+		}
+	]);
+stories.add('Section + Select', () => <SectionSelect />);
 
-			<Separator title='Section + Multi Select' />
-			{
-				UiKitMessage([{
-					type: 'section',
-					text: {
-						type: 'mrkdwn',
-						text: 'Section + select'
+const SectionDatePicker = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + DatePicker'
+			},
+			accessory: {
+				type: 'datepicker',
+				initial_date: '1990-04-28',
+				placeholder: {
+					type: 'plain_text',
+					text: 'Select a date',
+					emoji: true
+				}
+			}
+		}
+	]);
+stories.add('Section + DatePicker', () => <SectionDatePicker />);
+
+const SectionMultiSelect = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			text: {
+				type: 'mrkdwn',
+				text: 'Section + select'
+			},
+			accessory: {
+				type: 'multi_static_select',
+				options: [
+					{
+						text: {
+							type: 'plain_text',
+							text: 'button'
+						},
+						value: 1
 					},
-					accessory: {
-						type: 'multi_static_select',
-						options: [{
-							text: {
-								type: 'plain_text',
-								text: 'button'
-							},
-							value: 1
-						}, {
-							text: {
-								type: 'plain_text',
-								text: 'opt 1'
-							},
-							value: 2
-						}, {
-							text: {
-								type: 'plain_text',
-								text: 'opt 2'
-							},
-							value: 3
-						}, {
-							text: {
-								type: 'plain_text',
-								text: 'opt 3'
-							},
-							value: 4
-						}]
+					{
+						text: {
+							type: 'plain_text',
+							text: 'opt 1'
+						},
+						value: 2
+					},
+					{
+						text: {
+							type: 'plain_text',
+							text: 'opt 2'
+						},
+						value: 3
+					},
+					{
+						text: {
+							type: 'plain_text',
+							text: 'opt 3'
+						},
+						value: 4
 					}
-				}])
+				]
 			}
+		}
+	]);
+stories.add('Section + Multi Select', () => <SectionMultiSelect />);
 
-			<Separator title='Image' />
-			{
-				UiKitMessage([{
+const Image = () =>
+	UiKitMessage([
+		{
+			type: 'image',
+			title: {
+				type: 'plain_text',
+				text: 'Example Image',
+				emoji: true
+			},
+			imageUrl: 'https://raw.githubusercontent.com/RocketChat/Rocket.Chat.Artwork/master/Logos/icon-circle-256.png',
+			altText: 'Example Image'
+		}
+	]);
+stories.add('Image', () => <Image />);
+
+const Context = () =>
+	UiKitMessage([
+		{
+			type: 'context',
+			elements: [
+				{
 					type: 'image',
 					title: {
 						type: 'plain_text',
@@ -224,219 +288,211 @@ export default () => (
 					},
 					imageUrl: 'https://raw.githubusercontent.com/RocketChat/Rocket.Chat.Artwork/master/Logos/icon-circle-256.png',
 					altText: 'Example Image'
-				}])
-			}
+				},
+				{
+					type: 'mrkdwn',
+					text: 'context'
+				}
+			]
+		}
+	]);
+stories.add('Context', () => <Context />);
 
-			<Separator title='Context' />
-			{
-				UiKitMessage([{
-					type: 'context',
-					elements: [{
-						type: 'image',
-						title: {
-							type: 'plain_text',
-							text: 'Example Image',
-							emoji: true
-						},
-						imageUrl: 'https://raw.githubusercontent.com/RocketChat/Rocket.Chat.Artwork/master/Logos/icon-circle-256.png',
-						altText: 'Example Image'
+const ActionButton = () =>
+	UiKitMessage([
+		{
+			type: 'actions',
+			elements: [
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Approve'
 					},
-					{
-						type: 'mrkdwn',
-						text: 'context'
+					style: 'primary',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				},
+				{
+					type: 'button',
+					text: {
+						type: 'plain_text',
+						emoji: true,
+						text: 'Deny'
+					},
+					style: 'danger',
+					value: 'click_me_123'
+				}
+			]
+		}
+	]);
+stories.add('Action - Buttons', () => <ActionButton />);
+
+const Fields = () =>
+	UiKitMessage([
+		{
+			type: 'section',
+			fields: [
+				{
+					type: 'plain_text',
+					text: '*this is plain_text text*',
+					emoji: true
+				},
+				{
+					type: 'plain_text',
+					text: '*this is plain_text text*',
+					emoji: true
+				},
+				{
+					type: 'plain_text',
+					text: '*this is plain_text text*',
+					emoji: true
+				},
+				{
+					type: 'plain_text',
+					text: '*this is plain_text text*',
+					emoji: true
+				},
+				{
+					type: 'plain_text',
+					text: '*this is plain_text text*',
+					emoji: true
+				}
+			]
+		}
+	]);
+stories.add('Fields', () => <Fields />);
+
+const ActionSelect = () =>
+	UiKitMessage([
+		{
+			type: 'actions',
+			elements: [
+				{
+					type: 'conversations_select',
+					placeholder: {
+						type: 'plain_text',
+						text: 'Select a conversation',
+						emoji: true
 					}
-					]
-				}])
-			}
-
-			<Separator title='Action - Buttons' />
-			{
-				UiKitMessage([{
-					type: 'actions',
-					elements: [
+				},
+				{
+					type: 'channels_select',
+					placeholder: {
+						type: 'plain_text',
+						text: 'Select a channel',
+						emoji: true
+					}
+				},
+				{
+					type: 'users_select',
+					placeholder: {
+						type: 'plain_text',
+						text: 'Select a user',
+						emoji: true
+					}
+				},
+				{
+					type: 'static_select',
+					placeholder: {
+						type: 'plain_text',
+						text: 'Select an item',
+						emoji: true
+					},
+					options: [
 						{
-							type: 'button',
 							text: {
 								type: 'plain_text',
-								emoji: true,
-								text: 'Approve'
+								text: 'Excellent item 1',
+								emoji: true
 							},
-							style: 'primary',
-							value: 'click_me_123'
+							value: 'value-0'
 						},
 						{
-							type: 'button',
 							text: {
 								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
+								text: 'Fantastic item 2',
+								emoji: true
 							},
-							style: 'danger',
-							value: 'click_me_123'
+							value: 'value-1'
 						},
 						{
-							type: 'button',
 							text: {
 								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
+								text: 'Nifty item 3',
+								emoji: true
 							},
-							style: 'danger',
-							value: 'click_me_123'
+							value: 'value-2'
 						},
 						{
-							type: 'button',
 							text: {
 								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
+								text: 'Pretty good item 4',
+								emoji: true
 							},
-							style: 'danger',
-							value: 'click_me_123'
-						},
-						{
-							type: 'button',
-							text: {
-								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
-							},
-							style: 'danger',
-							value: 'click_me_123'
-						},
-						{
-							type: 'button',
-							text: {
-								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
-							},
-							style: 'danger',
-							value: 'click_me_123'
-						},
-						{
-							type: 'button',
-							text: {
-								type: 'plain_text',
-								emoji: true,
-								text: 'Deny'
-							},
-							style: 'danger',
-							value: 'click_me_123'
+							value: 'value-3'
 						}
 					]
-				}])
-			}
+				}
+			]
+		}
+	]);
+stories.add('Action - Select', () => <ActionSelect />);
 
-			<Separator title='Fields' />
-			{
-				UiKitMessage([
-					{
-						type: 'section',
-						fields: [
-							{
-								type: 'plain_text',
-								text: '*this is plain_text text*',
-								emoji: true
-							},
-							{
-								type: 'plain_text',
-								text: '*this is plain_text text*',
-								emoji: true
-							},
-							{
-								type: 'plain_text',
-								text: '*this is plain_text text*',
-								emoji: true
-							},
-							{
-								type: 'plain_text',
-								text: '*this is plain_text text*',
-								emoji: true
-							},
-							{
-								type: 'plain_text',
-								text: '*this is plain_text text*',
-								emoji: true
-							}
-						]
-					}])
-			}
-
-			<Separator title='Action - Select' />
-			{
-				UiKitMessage([{
-					type: 'actions',
-					elements: [
-						{
-							type: 'conversations_select',
-							placeholder: {
-								type: 'plain_text',
-								text: 'Select a conversation',
-								emoji: true
-							}
-						},
-						{
-							type: 'channels_select',
-							placeholder: {
-								type: 'plain_text',
-								text: 'Select a channel',
-								emoji: true
-							}
-						},
-						{
-							type: 'users_select',
-							placeholder: {
-								type: 'plain_text',
-								text: 'Select a user',
-								emoji: true
-							}
-						},
-						{
-							type: 'static_select',
-							placeholder: {
-								type: 'plain_text',
-								text: 'Select an item',
-								emoji: true
-							},
-							options: [
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Excellent item 1',
-										emoji: true
-									},
-									value: 'value-0'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Fantastic item 2',
-										emoji: true
-									},
-									value: 'value-1'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Nifty item 3',
-										emoji: true
-									},
-									value: 'value-2'
-								},
-								{
-									text: {
-										type: 'plain_text',
-										text: 'Pretty good item 4',
-										emoji: true
-									},
-									value: 'value-3'
-								}
-							]
-						}
-					]
-				}])
-			}
-		</ScrollView>
-	</SafeAreaView>
-);
+// stories.add('Section', () => UiKitMessage([{
+// 	type: 'section',
+// 	text: {
+// 		type: 'mrkdwn',
+// 		text: 'Section'
+// 	}
+// }]));

@@ -1,45 +1,48 @@
 import { put, takeLatest, all } from 'redux-saga/effects';
 import RNBootSplash from 'react-native-bootsplash';
 
-// import * as actions from '../actions';
-import { selectServerRequest, serverRequest } from '../actions/server';
-// import { selectServerRequest } from '../actions/server';
+import { BIOMETRY_ENABLED_KEY } from '../constants/localAuthentication';
 import UserPreferences from '../lib/userPreferences';
+import { selectServerRequest, serverRequest } from '../actions/server';
 import { setAllPreferences } from '../actions/sortPreferences';
-import { toggleCrashReport, toggleAnalyticsEvents } from '../actions/crashReport';
 import { APP } from '../actions/actionsTypes';
 import RocketChat from '../lib/rocketchat';
 import log from '../utils/log';
 import database from '../lib/database';
-import appConfig from '../../app.json';
 import { localAuthenticate } from '../utils/localAuthentication';
-import { appStart, ROOT_OUTSIDE, appReady } from '../actions/app';
+import { appReady, appStart } from '../actions/app';
+import { RootEnum } from '../definitions';
+
+import appConfig from '../../app.json';
 
 export const initLocalSettings = function* initLocalSettings() {
-	const sortPreferences = yield RocketChat.getSortPreferences();
+	const sortPreferences = RocketChat.getSortPreferences();
 	yield put(setAllPreferences(sortPreferences));
-
-	const allowCrashReport = yield RocketChat.getAllowCrashReport();
-	yield put(toggleCrashReport(allowCrashReport));
-
-	const allowAnalyticsEvents = yield RocketChat.getAllowAnalyticsEvents();
-	yield put(toggleAnalyticsEvents(allowAnalyticsEvents));
 };
+
+const BIOMETRY_MIGRATION_KEY = 'kBiometryMigration';
 
 const restore = function* restore() {
 	try {
-		const { token, server } = yield all({
-			token: UserPreferences.getStringAsync(RocketChat.TOKEN_KEY),
-			server: UserPreferences.getStringAsync(RocketChat.CURRENT_SERVER)
-		});
+		// Migration biometry setting from WatermelonDB to MMKV
+		// TODO: remove it after a few versions
+		const hasMigratedBiometry = UserPreferences.getBool(BIOMETRY_MIGRATION_KEY);
+		if (!hasMigratedBiometry) {
+			const serversDB = database.servers;
+			const serversCollection = serversDB.get('servers');
+			const servers = yield serversCollection.query().fetch();
+			const isBiometryEnabled = servers.some(server => !!server.biometry);
+			UserPreferences.setBool(BIOMETRY_ENABLED_KEY, isBiometryEnabled);
+			UserPreferences.setBool(BIOMETRY_MIGRATION_KEY, true);
+		}
 
-		if (!token || !server) {
-			yield all([
-				UserPreferences.removeItem(RocketChat.TOKEN_KEY),
-				UserPreferences.removeItem(RocketChat.CURRENT_SERVER)
-			]);
+		const { server } = appConfig;
+		const userId = UserPreferences.getString(`${RocketChat.TOKEN_KEY}-${server}`);
+
+		if (!userId) {
+			yield all([UserPreferences.removeItem(RocketChat.TOKEN_KEY), UserPreferences.removeItem(RocketChat.CURRENT_SERVER)]);
 			yield put(serverRequest(appConfig.server));
-			// yield put(appStart({ root: ROOT_OUTSIDE }));
+			yield put(appStart({ root: RootEnum.ROOT_OUTSIDE }));
 		} else {
 			const serversDB = database.servers;
 			const serverCollections = serversDB.get('servers');
@@ -57,12 +60,12 @@ const restore = function* restore() {
 		yield put(appReady({}));
 	} catch (e) {
 		log(e);
-		yield put(appStart({ root: ROOT_OUTSIDE }));
+		yield put(appStart({ root: RootEnum.ROOT_OUTSIDE }));
 	}
 };
 
-const start = function start() {
-	RNBootSplash.hide();
+const start = function* start() {
+	yield RNBootSplash.hide();
 };
 
 const root = function* root() {

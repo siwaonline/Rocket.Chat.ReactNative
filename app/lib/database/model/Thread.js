@@ -1,16 +1,16 @@
 import { Model } from '@nozbe/watermelondb';
-import {
-	field, relation, date, json
-} from '@nozbe/watermelondb/decorators';
+import { date, field, json, relation } from '@nozbe/watermelondb/decorators';
 
 import { sanitizer } from '../utils';
 
+export const THREADS_TABLE = 'threads';
+
 export default class Thread extends Model {
-	static table = 'threads';
+	static table = THREADS_TABLE;
 
 	static associations = {
 		subscriptions: { type: 'belongs_to', key: 'rid' }
-	}
+	};
 
 	@field('msg') msg;
 
@@ -75,4 +75,6 @@ export default class Thread extends Model {
 	@json('translations', sanitizer) translations;
 
 	@field('e2e') e2e;
+
+	@field('draft_message') draftMessage;
 }

@@ -1,18 +1,19 @@
 import { Model } from '@nozbe/watermelondb';
-import {
-	field, date, json, children
-} from '@nozbe/watermelondb/decorators';
+import { children, date, field, json } from '@nozbe/watermelondb/decorators';
+
 import { sanitizer } from '../utils';
 
+export const SUBSCRIPTIONS_TABLE = 'subscriptions';
+
 export default class Subscription extends Model {
-	static table = 'subscriptions';
+	static table = SUBSCRIPTIONS_TABLE;
 
 	static associations = {
 		messages: { type: 'has_many', foreignKey: 'rid' },
 		threads: { type: 'has_many', foreignKey: 'rid' },
 		thread_messages: { type: 'has_many', foreignKey: 'subscription_id' },
 		uploads: { type: 'has_many', foreignKey: 'rid' }
-	}
+	};
 
 	@field('_id') _id;
 
@@ -125,4 +126,8 @@ export default class Subscription extends Model {
 	@field('e2e_key_id') e2eKeyId;
 
 	@field('avatar_etag') avatarETag;
+
+	@field('team_id') teamId;
+
+	@field('team_main') teamMain;
 }

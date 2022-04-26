@@ -1,4 +1,4 @@
-import { StyleSheet, Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 import { MAX_SCREEN_CONTENT_WIDTH } from '../constants/tablet';
 
@@ -26,9 +26,9 @@ export default StyleSheet.create({
 	},
 	status: {
 		position: 'absolute',
-		bottom: -3,
-		right: -3,
-		borderWidth: 3
+		bottom: -2,
+		right: -2,
+		borderRadius: 10
 	},
 	textAlignCenter: {
 		textAlign: 'center'
